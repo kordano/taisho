@@ -1,2 +1,2 @@
 # taisho
-Some experiments with [trello API](https://developers.trello.com/v1.0/reference).
+- Trello integration via [trello API](https://developers.trello.com/v1.0/reference).
