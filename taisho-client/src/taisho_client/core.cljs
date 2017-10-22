@@ -8,30 +8,32 @@
 
 (enable-console-print!)
 
-(defonce app-state (atom {:text "Hello world!"}))
+(defonce app-state (atom {:status-list [{:title "open tasks" :counter 42}
+                                        {:title "weekly tasks" :counter 23}
+                                        {:title "closed tasks" :counter 666}]}))
 
 (defsnippet status-card "templates/trello_lists.html" [:.status-card]
   [{:keys [counter title]}]
   {[:#counter] (content counter)
    [:#title] (content title)})
 
-(defui HelloWorld
+(deftemplate status-page "templates/trello_lists.html"
+  [{:keys [status-list]}]
+  {[:.status-title] (content "Projekt Status")
+   [:#status-row] (content (mapv status-card status-list))})
+
+(defui CorePage
   Object
   (render [this]
     (dom/div
      nil
-     (dom/h3 #js {:className "center-align"} "Project Status")
-     (dom/div
-      #js {:className "row"}
-      (mapv
-       status-card
-       [{:title "open tasks" :counter 42}
-        {:title "weekly tasks" :counter 23}
-        {:title "closed tasks" :counter 666}]))))) 
+     (status-page (om/props this)))))
 
-(def hello (om/factory HelloWorld))
+(def reconciler
+  (om/reconciler
+   {:state app-state}))
 
-(js/ReactDOM.render (hello) (gdom/getElement "app"))
+(om/add-root! reconciler CorePage (gdom/getElement "app"))
 
 
 (defn on-js-reload []
@@ -39,3 +41,11 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
+
+(comment
+
+  (reset! app-state {:status-list [{:title "open tasks" :counter 42}
+                                   {:title "weekly tasks" :counter 23}
+                                   {:title "closed tasks" :counter 666}]})
+
+  )
